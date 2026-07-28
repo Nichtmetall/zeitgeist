@@ -80,25 +80,32 @@ export interface AppState {
 
 let persistTimer: ReturnType<typeof setTimeout> | null = null
 
+function writeNow(
+  get: () => AppState,
+  set: (partial: Partial<AppState>) => void
+): Promise<unknown> {
+  const state = get()
+  if (!state.loaded) return Promise.resolve()
+  set({ saving: true })
+  return window.zeitwerk
+    .saveData({
+      version: DATA_VERSION,
+      settings: state.settings,
+      workEntries: state.workEntries,
+      bookings: state.bookings,
+      templates: state.templates
+    })
+    .catch((error: unknown) => {
+      console.error('Speichern fehlgeschlagen', error)
+    })
+    .finally(() => set({ saving: false }))
+}
+
 function schedulePersist(get: () => AppState, set: (partial: Partial<AppState>) => void): void {
   if (persistTimer) clearTimeout(persistTimer)
   persistTimer = setTimeout(() => {
     persistTimer = null
-    const state = get()
-    if (!state.loaded) return
-    set({ saving: true })
-    void window.zeitwerk
-      .saveData({
-        version: DATA_VERSION,
-        settings: state.settings,
-        workEntries: state.workEntries,
-        bookings: state.bookings,
-        templates: state.templates
-      })
-      .catch((error: unknown) => {
-        console.error('Speichern fehlgeschlagen', error)
-      })
-      .finally(() => set({ saving: false }))
+    void writeNow(get, set)
   }, PERSIST_DELAY_MS)
 }
 
@@ -324,6 +331,18 @@ export const useAppStore = create<AppState>()((set, get) => {
     }
   }
 })
+
+/**
+ * Schreibt eine noch ausstehende Änderung sofort weg – wird vor dem Schließen
+ * des Fensters aufgerufen, damit die letzte Eingabe nicht verloren geht.
+ */
+export async function flushPersist(): Promise<void> {
+  if (persistTimer) {
+    clearTimeout(persistTimer)
+    persistTimer = null
+  }
+  await writeNow(useAppStore.getState, (partial) => useAppStore.setState(partial))
+}
 
 /** Aktuell laufende Erfassung, falls vorhanden. */
 export function selectRunningEntry(state: AppState): WorkEntry | undefined {

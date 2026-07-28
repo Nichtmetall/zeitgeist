@@ -43,6 +43,15 @@ const api = {
     return () => ipcRenderer.removeListener('menu:navigate', listener)
   },
 
+  /** Der Hauptprozess bittet vor dem Schließen um das Sichern offener Änderungen. */
+  onFlushRequest: (handler: () => void): (() => void) => {
+    const listener = (): void => handler()
+    ipcRenderer.on('app:flush', listener)
+    return () => ipcRenderer.removeListener('app:flush', listener)
+  },
+
+  reportFlushed: (): void => ipcRenderer.send('app:flushed'),
+
   onCommand: (handler: (command: string) => void): (() => void) => {
     const listener = (_event: Electron.IpcRendererEvent, command: string): void => handler(command)
     ipcRenderer.on('menu:command', listener)

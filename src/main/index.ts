@@ -1,4 +1,4 @@
-import { BrowserWindow, app, nativeTheme, shell } from 'electron'
+import { BrowserWindow, app, ipcMain, nativeTheme, shell } from 'electron'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { registerIpcHandlers } from './ipc'
@@ -31,6 +31,26 @@ function createWindow(): void {
 
   mainWindow.once('ready-to-show', () => {
     mainWindow?.show()
+  })
+
+  // Vor dem Schließen dem Renderer Gelegenheit geben, eine noch nicht
+  // geschriebene Änderung zu sichern.
+  let readyToClose = false
+  mainWindow.on('close', (event) => {
+    const window = mainWindow
+    if (readyToClose || !window) return
+    event.preventDefault()
+
+    const finish = (): void => {
+      readyToClose = true
+      void flushPendingWrites().then(() => window.close())
+    }
+    const timer = setTimeout(finish, 1500)
+    ipcMain.once('app:flushed', () => {
+      clearTimeout(timer)
+      finish()
+    })
+    window.webContents.send('app:flush')
   })
 
   // Externe Links im Standardbrowser öffnen, niemals im App-Fenster.

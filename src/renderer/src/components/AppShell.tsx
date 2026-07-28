@@ -38,7 +38,7 @@ import { formatDuration, formatTime, todayKey } from '@shared/time'
 import type { ThemeMode } from '@shared/types'
 import { useNow } from '../hooks/useNow'
 import { useReminders } from '../hooks/useReminders'
-import { selectRunningBreak, selectRunningEntry, useAppStore } from '../state/store'
+import { flushPersist, selectRunningBreak, selectRunningEntry, useAppStore } from '../state/store'
 import CalendarPage from '../pages/CalendarPage'
 import EntriesPage from '../pages/EntriesPage'
 import ReportsPage from '../pages/ReportsPage'
@@ -189,6 +189,13 @@ export default function AppShell(): JSX.Element {
       intent: wasOnBreak ? 'success' : 'info'
     })
   }, [runningEntry, runningBreak, toggleBreak, notify])
+
+  /* Offene Änderungen sichern, bevor das Fenster geschlossen wird */
+  useEffect(() => {
+    return window.zeitwerk.onFlushRequest(() => {
+      void flushPersist().finally(() => window.zeitwerk.reportFlushed())
+    })
+  }, [])
 
   /* Menübefehle des Hauptprozesses */
   useEffect(() => {

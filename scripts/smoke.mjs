@@ -443,6 +443,36 @@ async function run(window) {
   await shoot('12-dunkel')
   const darkApplied = await evaluate('getComputedStyle(document.body).backgroundColor')
   check(typeof darkApplied === 'string', `Hintergrundfarbe: ${darkApplied}`)
+
+  console.log('\nSchließen')
+  // Eine Einstellung ändern und sofort schließen: Die Änderung darf nicht
+  // verloren gehen, und das Fenster muss sich trotzdem schließen lassen.
+  const quitRequested = new Promise((resolve) => {
+    app.once('will-quit', (event) => {
+      event.preventDefault()
+      resolve(true)
+    })
+  })
+  await evaluate(`(() => {
+    const light = [...document.querySelectorAll('input[type="radio"]')].find((r) => r.value === 'light');
+    if (!light) return false;
+    light.click();
+    return true;
+  })()`)
+  window.close()
+
+  const quit = await Promise.race([quitRequested, wait(6000).then(() => false)])
+  check(quit === true, 'Fenster lässt sich schließen und die Anwendung beendet sich')
+
+  const stored = JSON.parse(readFileSync(join(PROFILE_DIR, 'zeitwerk-data.json'), 'utf-8'))
+  check(
+    stored.settings.themeMode === 'light',
+    `Letzte Änderung wurde vor dem Schließen gesichert (themeMode=${stored.settings.themeMode})`
+  )
+  check(
+    stored.bookings.some((item) => item.project === 'Rauchtest'),
+    'Die per Ziehen angelegte Buchung liegt in der Datendatei'
+  )
 }
 
 app.whenReady().then(async () => {
