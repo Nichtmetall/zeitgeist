@@ -30,6 +30,8 @@ export interface ReportColumn {
 export interface ReportSection {
   id: string
   title: string
+  /** Kurzform für Excel-Blattnamen (höchstens 31 Zeichen). */
+  sheetName: string
   columns: ReportColumn[]
   rows: string[][]
   emptyHint?: string
@@ -82,6 +84,7 @@ export function buildReport(
     sections.push({
       id: 'workEntries',
       title: 'Arbeitszeiten',
+      sheetName: 'Arbeitszeiten',
       columns: [
         { header: 'Datum', width: 14 },
         { header: 'Beginn', width: 9, align: 'right' },
@@ -119,6 +122,7 @@ export function buildReport(
     sections.push({
       id: 'bookings',
       title: 'Zeitbuchungen (Projekte und Aufgaben)',
+      sheetName: 'Zeitbuchungen',
       columns: [
         { header: 'Datum', width: 14 },
         { header: 'Von', width: 9, align: 'right' },
@@ -145,6 +149,7 @@ export function buildReport(
     sections.push({
       id: 'daily',
       title: 'Tagesübersicht',
+      sheetName: 'Tagesübersicht',
       columns: [
         { header: 'Datum', width: 14 },
         { header: 'Beginn', width: 9, align: 'right' },
@@ -185,6 +190,7 @@ export function buildReport(
       sections.push({
         id: 'projects',
         title: 'Projektübersicht',
+        sheetName: 'Projektübersicht',
         columns: [
           { header: 'Projekt', width: 34 },
           { header: 'Dauer', width: 12, align: 'right' },

@@ -34,7 +34,7 @@ describe('Zeitformatierung', () => {
 
   it('formatiert Dauern mit Vorzeichen', () => {
     expect(formatDuration(485)).toBe('8:05 h')
-    expect(formatDuration(-30)).toBe('−0:30 h')
+    expect(formatDuration(-30)).toBe('-0:30 h')
     expect(formatBalance(0)).toBe('±0:00 h')
     expect(formatBalance(45)).toBe('+0:45 h')
     expect(formatDecimalHours(90)).toBe('1,50')

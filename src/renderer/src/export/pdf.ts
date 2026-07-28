@@ -9,6 +9,7 @@
 import { jsPDF } from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import type { ReportModel } from '@shared/report'
+import { toWinAnsi } from '@shared/winansi'
 
 const BRAND: [number, number, number] = [15, 108, 189]
 const TEXT: [number, number, number] = [27, 26, 25]
@@ -21,15 +22,15 @@ export function buildPdf(report: ReportModel): Uint8Array {
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(18)
   doc.setTextColor(...TEXT)
-  doc.text(report.title, 14, 18)
+  doc.text(toWinAnsi(report.title), 14, 18)
 
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(10)
   doc.setTextColor(...MUTED)
   const subtitleParts = [report.periodLabel]
   if (report.employee) subtitleParts.unshift(report.employee)
-  doc.text(subtitleParts.join(' · '), 14, 25)
-  doc.text(`Erstellt am ${report.generatedAt}`, pageWidth - 14, 25, { align: 'right' })
+  doc.text(toWinAnsi(subtitleParts.join(' · ')), 14, 25)
+  doc.text(toWinAnsi(`Erstellt am ${report.generatedAt}`), pageWidth - 14, 25, { align: 'right' })
 
   doc.setDrawColor(...BRAND)
   doc.setLineWidth(0.8)
@@ -38,7 +39,7 @@ export function buildPdf(report: ReportModel): Uint8Array {
   autoTable(doc, {
     startY: 33,
     head: [['Kennzahl', 'Wert']],
-    body: report.summary.map((item) => [item.label, item.value]),
+    body: report.summary.map((item) => [toWinAnsi(item.label), toWinAnsi(item.value)]),
     theme: 'grid',
     styles: { font: 'helvetica', fontSize: 9, cellPadding: 1.8, textColor: TEXT },
     headStyles: { fillColor: BRAND, textColor: [255, 255, 255], fontStyle: 'bold' },
@@ -52,15 +53,20 @@ export function buildPdf(report: ReportModel): Uint8Array {
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(11)
     doc.setTextColor(...TEXT)
-    doc.text(section.title, 14, startY - 4)
+    doc.text(toWinAnsi(section.title), 14, startY - 4)
 
     autoTable(doc, {
       startY,
-      head: [section.columns.map((column) => column.header)],
+      head: [section.columns.map((column) => toWinAnsi(column.header))],
       body:
         section.rows.length > 0
-          ? section.rows
-          : [[section.emptyHint ?? 'Keine Daten', ...section.columns.slice(1).map(() => '')]],
+          ? section.rows.map((row) => row.map(toWinAnsi))
+          : [
+              [
+                toWinAnsi(section.emptyHint ?? 'Keine Daten'),
+                ...section.columns.slice(1).map(() => '')
+              ]
+            ],
       theme: 'striped',
       styles: { font: 'helvetica', fontSize: 8.5, cellPadding: 1.6, textColor: TEXT },
       headStyles: { fillColor: BRAND, textColor: [255, 255, 255], fontStyle: 'bold' },
@@ -81,7 +87,7 @@ export function buildPdf(report: ReportModel): Uint8Array {
       startY: lastY(doc) + 12,
       head: [['Hinweise nach Arbeitszeitgesetz', 'Einstufung']],
       body: report.notes.map((note) => [
-        note.text,
+        toWinAnsi(note.text),
         note.severity === 'error' ? 'Verstoß' : note.severity === 'warning' ? 'Warnung' : 'Hinweis'
       ]),
       theme: 'grid',

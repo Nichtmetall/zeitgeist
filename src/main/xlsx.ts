@@ -66,7 +66,7 @@ export async function writeXlsx(report: ReportModel, filePath: string): Promise<
 
   /* ---------------------------------- Daten ------------------------------- */
   for (const section of report.sections) {
-    const sheet = workbook.addWorksheet(sheetName(section.title, used))
+    const sheet = workbook.addWorksheet(sheetName(section.sheetName || section.title, used))
     sheet.columns = section.columns.map((column) => ({
       header: column.header,
       width: Math.max(10, column.width + 2)

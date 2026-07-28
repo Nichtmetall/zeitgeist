@@ -166,10 +166,15 @@ export function formatDateMedium(value: Date | string): string {
   return MEDIUM_DATE.format(date)
 }
 
-/** Dauer in Minuten als `8:05 h`. Negative Werte behalten ihr Vorzeichen. */
+/**
+ * Dauer in Minuten als `8:05 h`. Negative Werte behalten ihr Vorzeichen.
+ *
+ * Bewusst mit dem ASCII-Minus statt dem typografischen Minuszeichen: Die
+ * Standardschriften im PDF-Export decken U+2212 nicht ab.
+ */
 export function formatDuration(minutes: number, withUnit = true): string {
   const rounded = Math.round(minutes)
-  const sign = rounded < 0 ? '−' : ''
+  const sign = rounded < 0 ? '-' : ''
   const abs = Math.abs(rounded)
   const text = `${sign}${Math.floor(abs / 60)}:${pad(abs % 60)}`
   return withUnit ? `${text} h` : text
