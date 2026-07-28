@@ -265,7 +265,10 @@ export default function AppShell(): JSX.Element {
               {runningBreak ? 'Pause beenden' : 'Pause'}
             </Button>
           </Tooltip>
-          <Tooltip content="Arbeitszeit starten oder stoppen (Strg+Umschalt+S)" relationship="label">
+          <Tooltip
+            content="Arbeitszeit starten oder stoppen (Strg+Umschalt+S)"
+            relationship="label"
+          >
             <Button
               appearance="primary"
               icon={runningEntry ? <StopRegular /> : <PlayRegular />}
@@ -284,7 +287,9 @@ export default function AppShell(): JSX.Element {
               <Tooltip content="Darstellung" relationship="label">
                 <Button
                   appearance="subtle"
-                  icon={settings.themeMode === 'dark' ? <WeatherMoonRegular /> : <WeatherSunnyRegular />}
+                  icon={
+                    settings.themeMode === 'dark' ? <WeatherMoonRegular /> : <WeatherSunnyRegular />
+                  }
                   aria-label="Darstellung wählen"
                 />
               </Tooltip>

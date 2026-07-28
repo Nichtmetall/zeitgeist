@@ -14,13 +14,7 @@
  * Renderer-Prozess sowie in Tests identisch verwendet werden können.
  */
 
-import type {
-  Booking,
-  ComplianceIssue,
-  DaySummary,
-  Settings,
-  WorkEntry
-} from './types'
+import type { Booking, ComplianceIssue, DaySummary, Settings, WorkEntry } from './types'
 import {
   addDays,
   formatDuration,
@@ -651,7 +645,8 @@ export function breakGuidance(
       : workMinutes <= settings.breakThreshold2Minutes
         ? settings.breakThreshold2Minutes
         : null
-  const untilNextThreshold = nextThreshold === null ? null : Math.max(0, nextThreshold - workMinutes)
+  const untilNextThreshold =
+    nextThreshold === null ? null : Math.max(0, nextThreshold - workMinutes)
 
   let status: BreakStatus = 'ok'
   let message = ''

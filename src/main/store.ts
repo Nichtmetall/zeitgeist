@@ -58,7 +58,9 @@ function sanitizeSettings(input: unknown): Settings {
   if (!Array.isArray(merged.workdays) || merged.workdays.length === 0) {
     merged.workdays = [...DEFAULT_SETTINGS.workdays]
   } else {
-    merged.workdays = [...new Set(merged.workdays.map(Number).filter((day) => day >= 1 && day <= 7))]
+    merged.workdays = [
+      ...new Set(merged.workdays.map(Number).filter((day) => day >= 1 && day <= 7))
+    ]
     if (merged.workdays.length === 0) merged.workdays = [...DEFAULT_SETTINGS.workdays]
   }
 

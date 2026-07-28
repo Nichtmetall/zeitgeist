@@ -82,9 +82,17 @@ export function buildMenu(window: BrowserWindow): void {
     {
       label: 'Ansicht',
       submenu: [
-        { label: 'Zeiterfassung', accelerator: 'CmdOrCtrl+1', click: () => navigate(window, 'tracker') },
+        {
+          label: 'Zeiterfassung',
+          accelerator: 'CmdOrCtrl+1',
+          click: () => navigate(window, 'tracker')
+        },
         { label: 'Einträge', accelerator: 'CmdOrCtrl+2', click: () => navigate(window, 'entries') },
-        { label: 'Kalender', accelerator: 'CmdOrCtrl+3', click: () => navigate(window, 'calendar') },
+        {
+          label: 'Kalender',
+          accelerator: 'CmdOrCtrl+3',
+          click: () => navigate(window, 'calendar')
+        },
         { label: 'Berichte', accelerator: 'CmdOrCtrl+4', click: () => navigate(window, 'reports') },
         {
           label: 'Einstellungen',

@@ -54,14 +54,7 @@ export interface Booking {
 }
 
 export type BookingColor =
-  | 'brand'
-  | 'seafoam'
-  | 'lavender'
-  | 'peach'
-  | 'lilac'
-  | 'gold'
-  | 'forest'
-  | 'steel'
+  'brand' | 'seafoam' | 'lavender' | 'peach' | 'lilac' | 'gold' | 'forest' | 'steel'
 
 /** Vorlage zum schnellen Anlegen wiederkehrender Zeitbuchungen. */
 export interface BookingTemplate {

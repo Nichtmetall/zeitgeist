@@ -59,7 +59,8 @@ export async function writeXlsx(report: ReportModel, filePath: string): Promise<
     for (const note of report.notes) {
       const row = overview.addRow([note.text, note.severity === 'error' ? 'Verstoß' : 'Hinweis'])
       row.getCell(1).alignment = { wrapText: true }
-      if (note.severity === 'error') row.getCell(2).font = { color: { argb: 'FFA4262C' }, bold: true }
+      if (note.severity === 'error')
+        row.getCell(2).font = { color: { argb: 'FFA4262C' }, bold: true }
     }
   }
 

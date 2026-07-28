@@ -15,6 +15,7 @@ import {
   Option,
   SpinButton,
   Switch,
+  Text,
   Textarea,
   makeStyles,
   tokens
@@ -55,7 +56,11 @@ const useStyles = makeStyles({
     borderRadius: tokens.borderRadiusCircular,
     marginRight: tokens.spacingHorizontalS
   },
-  optionRow: { display: 'flex', alignItems: 'center' }
+  optionRow: { display: 'flex', alignItems: 'center' },
+  duration: {
+    fontVariantNumeric: 'tabular-nums',
+    paddingTop: tokens.spacingVerticalSNudge
+  }
 })
 
 export interface BookingDraft {
@@ -351,14 +356,14 @@ export default function BookingDialog({
                   onChange={(_event, data) => setBillable(data.checked)}
                 />
               </Field>
-              <Field label="Dauer">
-                <Button appearance="transparent" disabled>
+              <Field label="Gesamtdauer">
+                <Text weight="semibold" className={styles.duration}>
                   {formatDuration(times.minutes)}
-                </Button>
+                </Text>
               </Field>
-              <Field label="Als Vorlage">
+              <Field label="Wiederverwenden">
                 <Button icon={<BookmarkRegular />} onClick={handleSaveAsTemplate}>
-                  Speichern
+                  Als Vorlage sichern
                 </Button>
               </Field>
             </div>

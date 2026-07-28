@@ -33,15 +33,21 @@ import {
   SeatRegular,
   StopRegular
 } from '@fluentui/react-icons'
-import { breakGuidance, checkAveragingPeriod, summarizeDay } from '@shared/arbzg'
+import { breakGuidance, checkAveragingPeriod, summarizeDay, summarizePeriod } from '@shared/arbzg'
 import { WORK_KIND_LABELS } from '@shared/defaults'
 import {
+  addDays,
   formatBalance,
   formatCountdown,
+  formatDate,
   formatDateLong,
+  formatDateMedium,
   formatDuration,
   formatTime,
+  isoWeekNumber,
   minutesBetween,
+  startOfWeek,
+  toDateKey,
   todayKey
 } from '@shared/time'
 import type { ErgonomicsPhase, WorkEntry, WorkKind } from '@shared/types'
@@ -178,6 +184,12 @@ export default function TrackerPage(): JSX.Element {
     [workEntries, settings, now]
   )
 
+  const week = useMemo(() => {
+    const start = startOfWeek(now, settings.weekStartsOn)
+    const keys = Array.from({ length: 7 }, (_, index) => toDateKey(addDays(start, index)))
+    return summarizePeriod(keys, workEntries, bookings, settings, now)
+  }, [now, workEntries, bookings, settings])
+
   const elapsedToday = summary.netMinutes
   const targetProgress = settings.dailyTargetMinutes
     ? Math.min(1, elapsedToday / settings.dailyTargetMinutes)
@@ -226,7 +238,9 @@ export default function TrackerPage(): JSX.Element {
       >
         <div className={styles.hero}>
           <div>
-            <Caption1>{runningBreak ? 'Pause läuft' : runningEntry ? 'Arbeitszeit läuft' : 'Gestoppt'}</Caption1>
+            <Caption1>
+              {runningBreak ? 'Pause läuft' : runningEntry ? 'Arbeitszeit läuft' : 'Gestoppt'}
+            </Caption1>
             <Text className={styles.clock} block>
               {formatDuration(elapsedToday, false)}
             </Text>
@@ -257,7 +271,12 @@ export default function TrackerPage(): JSX.Element {
                 Arbeitszeit stoppen
               </Button>
             ) : (
-              <Button appearance="primary" size="large" icon={<PlayRegular />} onClick={handleStart}>
+              <Button
+                appearance="primary"
+                size="large"
+                icon={<PlayRegular />}
+                onClick={handleStart}
+              >
                 Arbeitszeit starten
               </Button>
             )}
@@ -324,10 +343,7 @@ export default function TrackerPage(): JSX.Element {
         </div>
       </SectionCard>
 
-      <SectionCard
-        title="Hinweise nach Arbeitszeitgesetz"
-        description={guidance.message}
-      >
+      <SectionCard title="Hinweise nach Arbeitszeitgesetz" description={guidance.message}>
         <ComplianceMessages issues={issues} max={8} />
       </SectionCard>
 
@@ -357,17 +373,11 @@ export default function TrackerPage(): JSX.Element {
                 <Text className={styles.countdown}>
                   {formatCountdown(ergonomics.remainingMs / 1000)}
                 </Text>
-                <Caption1>
-                  von {phaseDurationMinutes(ergonomics.phase, settings)} Minuten
-                </Caption1>
+                <Caption1>von {phaseDurationMinutes(ergonomics.phase, settings)} Minuten</Caption1>
               </div>
               <ProgressBar
                 thickness="large"
-                value={
-                  ergonomics.totalMs > 0
-                    ? 1 - ergonomics.remainingMs / ergonomics.totalMs
-                    : 0
-                }
+                value={ergonomics.totalMs > 0 ? 1 - ergonomics.remainingMs / ergonomics.totalMs : 0}
               />
               <Body1>{PHASE_HINTS[ergonomics.phase]}</Body1>
               <Caption1>
@@ -400,6 +410,94 @@ export default function TrackerPage(): JSX.Element {
             Haltungswechsel erinnert zu werden.
           </Body1>
         )}
+      </SectionCard>
+
+      <SectionCard
+        title={`Diese Woche (KW ${isoWeekNumber(now)})`}
+        description={`${formatDate(week.days[0].date)} – ${formatDate(
+          week.days[week.days.length - 1].date
+        )}`}
+      >
+        <StatRow>
+          <StatTile label="Nettoarbeitszeit" value={formatDuration(week.netMinutes)} />
+          <StatTile label="Wochensoll" value={formatDuration(settings.weeklyTargetMinutes)} />
+          <StatTile
+            label="Saldo"
+            value={formatBalance(week.netMinutes - settings.weeklyTargetMinutes)}
+            tone={week.netMinutes - settings.weeklyTargetMinutes >= 0 ? 'positive' : 'negative'}
+          />
+          <StatTile label="Pausen" value={formatDuration(week.breakMinutes)} />
+          <StatTile label="Projektzeit" value={formatDuration(week.bookedMinutes)} />
+        </StatRow>
+        <ProgressBar
+          thickness="large"
+          value={
+            settings.weeklyTargetMinutes > 0
+              ? Math.min(1, week.netMinutes / settings.weeklyTargetMinutes)
+              : 0
+          }
+        />
+        <Table size="small" aria-label="Wochenübersicht">
+          <TableHeader>
+            <TableRow>
+              <TableHeaderCell>Tag</TableHeaderCell>
+              <TableHeaderCell>Beginn</TableHeaderCell>
+              <TableHeaderCell>Ende</TableHeaderCell>
+              <TableHeaderCell>Pause</TableHeaderCell>
+              <TableHeaderCell>Netto</TableHeaderCell>
+              <TableHeaderCell>Soll</TableHeaderCell>
+              <TableHeaderCell>Saldo</TableHeaderCell>
+              <TableHeaderCell>Hinweise</TableHeaderCell>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {week.days.map((day) => {
+              const problems = day.issues.filter(
+                (issue) => issue.severity === 'error' || issue.severity === 'warning'
+              )
+              return (
+                <TableRow key={day.date}>
+                  <TableCell>{formatDateMedium(day.date)}</TableCell>
+                  <TableCell>{day.firstStart ? formatTime(day.firstStart) : '–'}</TableCell>
+                  <TableCell>
+                    {day.running ? 'läuft' : day.lastEnd ? formatTime(day.lastEnd) : '–'}
+                  </TableCell>
+                  <TableCell>
+                    {day.breakMinutes > 0 ? formatDuration(day.breakMinutes) : '–'}
+                  </TableCell>
+                  <TableCell>{day.netMinutes > 0 ? formatDuration(day.netMinutes) : '–'}</TableCell>
+                  <TableCell>{formatDuration(day.targetMinutes)}</TableCell>
+                  <TableCell>
+                    {day.netMinutes > 0 || day.targetMinutes > 0
+                      ? formatBalance(day.balanceMinutes)
+                      : '–'}
+                  </TableCell>
+                  <TableCell>
+                    {problems.length > 0 ? (
+                      <Tooltip
+                        relationship="description"
+                        content={problems.map((issue) => issue.title).join(' · ')}
+                      >
+                        <Badge
+                          appearance="tint"
+                          color={
+                            problems.some((issue) => issue.severity === 'error')
+                              ? 'danger'
+                              : 'warning'
+                          }
+                        >
+                          {problems.length}
+                        </Badge>
+                      </Tooltip>
+                    ) : (
+                      '–'
+                    )}
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
       </SectionCard>
 
       <SectionCard
@@ -462,7 +560,9 @@ export default function TrackerPage(): JSX.Element {
                         </Tooltip>
                       )}
                     </TableCell>
-                    <TableCell>{formatDuration(Math.max(0, grossMinutes - breakMinutes))}</TableCell>
+                    <TableCell>
+                      {formatDuration(Math.max(0, grossMinutes - breakMinutes))}
+                    </TableCell>
                     <TableCell>{WORK_KIND_LABELS[entry.kind]}</TableCell>
                     <TableCell>{entry.note ?? ''}</TableCell>
                     <TableCell>

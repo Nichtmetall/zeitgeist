@@ -155,12 +155,14 @@ const MEDIUM_DATE = new Intl.DateTimeFormat('de-DE', {
 })
 
 export function formatDateLong(value: Date | string): string {
-  const date = typeof value === 'string' ? (value.length === 10 ? fromDateKey(value) : parseIso(value)) : value
+  const date =
+    typeof value === 'string' ? (value.length === 10 ? fromDateKey(value) : parseIso(value)) : value
   return LONG_DATE.format(date)
 }
 
 export function formatDateMedium(value: Date | string): string {
-  const date = typeof value === 'string' ? (value.length === 10 ? fromDateKey(value) : parseIso(value)) : value
+  const date =
+    typeof value === 'string' ? (value.length === 10 ? fromDateKey(value) : parseIso(value)) : value
   return MEDIUM_DATE.format(date)
 }
 

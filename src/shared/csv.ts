@@ -17,14 +17,7 @@ import {
   toDateKey,
   toLocalIso
 } from './time'
-import type {
-  Booking,
-  BookingColor,
-  BreakInterval,
-  Settings,
-  WorkEntry,
-  WorkKind
-} from './types'
+import type { Booking, BookingColor, BreakInterval, Settings, WorkEntry, WorkKind } from './types'
 
 export const WORK_ENTRY_TYPE = 'Arbeitszeit'
 export const BOOKING_TYPE = 'Zeitbuchung'
@@ -56,7 +49,9 @@ function escapeValue(value: string, delimiter: string): string {
 }
 
 export function rowsToCsv(rows: string[][], delimiter = ';'): string {
-  return rows.map((row) => row.map((cell) => escapeValue(cell ?? '', delimiter)).join(delimiter)).join('\r\n')
+  return rows
+    .map((row) => row.map((cell) => escapeValue(cell ?? '', delimiter)).join(delimiter))
+    .join('\r\n')
 }
 
 function serializeBreaks(breaks: BreakInterval[]): string {
@@ -271,9 +266,7 @@ export function parseImportCsv(text: string, delimiter?: string): CsvImportResul
   const noteIndex = columnOf('Notiz', 'Note', 'Bemerkung')
 
   if (dateIndex < 0 || startIndex < 0) {
-    result.errors.push(
-      'Die Kopfzeile muss mindestens die Spalten "Datum" und "Beginn" enthalten.'
-    )
+    result.errors.push('Die Kopfzeile muss mindestens die Spalten "Datum" und "Beginn" enthalten.')
     return result
   }
 
@@ -286,14 +279,18 @@ export function parseImportCsv(text: string, delimiter?: string): CsvImportResul
 
     const dateKey = parseDateCell(cell(dateIndex))
     if (!dateKey) {
-      result.errors.push(`Zeile ${lineNumber}: Datum "${cell(dateIndex)}" konnte nicht gelesen werden.`)
+      result.errors.push(
+        `Zeile ${lineNumber}: Datum "${cell(dateIndex)}" konnte nicht gelesen werden.`
+      )
       result.skipped += 1
       continue
     }
 
     const startDate = combineDateAndTime(dateKey, cell(startIndex))
     if (!startDate) {
-      result.errors.push(`Zeile ${lineNumber}: Beginn "${cell(startIndex)}" ist keine gültige Uhrzeit.`)
+      result.errors.push(
+        `Zeile ${lineNumber}: Beginn "${cell(startIndex)}" ist keine gültige Uhrzeit.`
+      )
       result.skipped += 1
       continue
     }

@@ -143,7 +143,9 @@ export default function EntriesPage(): JSX.Element {
         .filter((booking) => booking.date >= from && booking.date <= to)
         .filter((booking) =>
           term
-            ? `${booking.project} ${booking.description} ${booking.date}`.toLowerCase().includes(term)
+            ? `${booking.project} ${booking.description} ${booking.date}`
+                .toLowerCase()
+                .includes(term)
             : true
         )
         .sort((a, b) => b.start.localeCompare(a.start)),
@@ -427,7 +429,11 @@ export default function EntriesPage(): JSX.Element {
             firstDayOfWeek={settings.weekStartsOn % 7}
           />
           <Toolbar aria-label="Schnellfilter">
-            <Button appearance="subtle" icon={<FilterRegular />} onClick={() => applyQuickRange('today')}>
+            <Button
+              appearance="subtle"
+              icon={<FilterRegular />}
+              onClick={() => applyQuickRange('today')}
+            >
               Heute
             </Button>
             <Button appearance="subtle" onClick={() => applyQuickRange('week')}>
@@ -524,7 +530,9 @@ export default function EntriesPage(): JSX.Element {
             focusMode="composite"
           >
             <DataGridHeader>
-              <DataGridRow selectionCell={{ checkboxIndicator: { 'aria-label': 'Alle auswählen' } }}>
+              <DataGridRow
+                selectionCell={{ checkboxIndicator: { 'aria-label': 'Alle auswählen' } }}
+              >
                 {({ renderHeaderCell }) => (
                   <DataGridHeaderCell>{renderHeaderCell()}</DataGridHeaderCell>
                 )}

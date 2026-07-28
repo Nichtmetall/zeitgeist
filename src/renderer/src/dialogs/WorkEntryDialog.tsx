@@ -137,7 +137,9 @@ export default function WorkEntryDialog({
     let outsideBreak = false
     for (const pause of breaks) {
       const fromIso = isoAt(dateKey, pause.from, startDate)
-      const toIso = pause.to ? isoAt(dateKey, pause.to, fromIso ? new Date(fromIso) : startDate) : null
+      const toIso = pause.to
+        ? isoAt(dateKey, pause.to, fromIso ? new Date(fromIso) : startDate)
+        : null
       if (!fromIso || !toIso) {
         invalidBreak = true
         continue
@@ -285,7 +287,9 @@ export default function WorkEntryDialog({
                   increment={5}
                   onChange={(value) =>
                     setBreaks((current) =>
-                      current.map((item) => (item.id === pause.id ? { ...item, from: value } : item))
+                      current.map((item) =>
+                        item.id === pause.id ? { ...item, from: value } : item
+                      )
                     )
                   }
                 />
@@ -315,10 +319,7 @@ export default function WorkEntryDialog({
               appearance="secondary"
               icon={<AddRegular />}
               onClick={() =>
-                setBreaks((current) => [
-                  ...current,
-                  { id: createId(), from: '12:00', to: '12:30' }
-                ])
+                setBreaks((current) => [...current, { id: createId(), from: '12:00', to: '12:30' }])
               }
             >
               Pause hinzufügen

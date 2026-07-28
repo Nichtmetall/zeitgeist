@@ -5,16 +5,11 @@
  * laufen ausschließlich über diese klar umrissenen Kanäle.
  */
 
-import { BrowserWindow, Notification, dialog, ipcMain, shell } from 'electron'
+import { BrowserWindow, Notification, dialog, ipcMain, powerMonitor, shell } from 'electron'
 import { readFile } from 'node:fs/promises'
 import { basename } from 'node:path'
 import type { ReportModel } from '../shared/report'
-import type {
-  AppData,
-  ExportResult,
-  ImportResult,
-  NotificationRequest
-} from '../shared/types'
+import type { AppData, ExportResult, ImportResult, NotificationRequest } from '../shared/types'
 import { dataFilePath, loadData, saveData } from './store'
 import { writeXlsx } from './xlsx'
 
@@ -121,12 +116,7 @@ export function registerIpcHandlers(): void {
     async (event, request: SaveXlsxRequest): Promise<ExportResult> => {
       try {
         const window = BrowserWindow.fromWebContents(event.sender)
-        const filePath = await askForPath(
-          window,
-          request.defaultName,
-          'Excel-Arbeitsmappe',
-          'xlsx'
-        )
+        const filePath = await askForPath(window, request.defaultName, 'Excel-Arbeitsmappe', 'xlsx')
         if (!filePath) return { ok: false, canceled: true }
         await writeXlsx(request.report, filePath)
         return { ok: true, filePath }
@@ -179,4 +169,7 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('app:flashFrame', (event, flash: boolean): void => {
     BrowserWindow.fromWebContents(event.sender)?.flashFrame(flash)
   })
+
+  // Sekunden ohne Maus- oder Tastatureingabe – Grundlage für den Inaktivitätshinweis.
+  ipcMain.handle('app:idleSeconds', (): number => powerMonitor.getSystemIdleTime())
 }

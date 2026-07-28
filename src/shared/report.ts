@@ -74,13 +74,7 @@ export function buildReport(
 
   const workEntries = inRange(data.workEntries)
   const bookings = inRange(data.bookings)
-  const period: PeriodSummary = summarizePeriod(
-    dateKeys,
-    workEntries,
-    bookings,
-    settings,
-    now
-  )
+  const period: PeriodSummary = summarizePeriod(dateKeys, workEntries, bookings, settings, now)
 
   const sections: ReportSection[] = []
 

@@ -284,7 +284,10 @@ export default function CalendarPage(): JSX.Element {
         }
       >
         <div className={styles.toolbar}>
-          <TabList selectedValue={view} onTabSelect={(_event, data) => setView(data.value as ViewMode)}>
+          <TabList
+            selectedValue={view}
+            onTabSelect={(_event, data) => setView(data.value as ViewMode)}
+          >
             <Tab value="day">Tagesansicht</Tab>
             <Tab value="week">Wochenansicht</Tab>
           </TabList>

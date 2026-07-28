@@ -39,14 +39,7 @@ import {
 } from '@fluentui/react-icons'
 import { buildCsv, dedupeImport, parseImportCsv, type CsvImportResult } from '@shared/csv'
 import { buildReport } from '@shared/report'
-import {
-  addDays,
-  formatDate,
-  formatDuration,
-  startOfWeek,
-  toDateKey,
-  todayKey
-} from '@shared/time'
+import { addDays, formatDate, formatDuration, startOfWeek, toDateKey, todayKey } from '@shared/time'
 import type { ExportDataset } from '@shared/types'
 import { DateField } from '../components/fields'
 import { useNotify } from '../components/notifications'
@@ -228,10 +221,14 @@ export default function ReportsPage({ importSignal }: ReportsPageProps): JSX.Ele
     if (!entry.end) return total
     const breaks = entry.breaks.reduce(
       (sum, pause) =>
-        pause.end ? sum + (new Date(pause.end).getTime() - new Date(pause.start).getTime()) / 60000 : sum,
+        pause.end
+          ? sum + (new Date(pause.end).getTime() - new Date(pause.start).getTime()) / 60000
+          : sum,
       0
     )
-    return total + (new Date(entry.end).getTime() - new Date(entry.start).getTime()) / 60000 - breaks
+    return (
+      total + (new Date(entry.end).getTime() - new Date(entry.start).getTime()) / 60000 - breaks
+    )
   }, 0)
   const bookedMinutes = selection.bookings.reduce(
     (total, booking) =>

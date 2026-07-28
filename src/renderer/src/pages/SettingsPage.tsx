@@ -154,11 +154,7 @@ export default function SettingsPage(): JSX.Element {
         <MessageBar intent="info" icon={<InfoRegular />}>
           <MessageBarBody>
             Alle Vorgaben lassen sich anpassen. Die Voreinstellungen entsprechen dem deutschen{' '}
-            <Link
-              href="https://www.gesetze-im-internet.de/arbzg/"
-              target="_blank"
-              rel="noreferrer"
-            >
+            <Link href="https://www.gesetze-im-internet.de/arbzg/" target="_blank" rel="noreferrer">
               Arbeitszeitgesetz
             </Link>
             . Änderungen wirken sofort auf alle Auswertungen und Hinweise.
@@ -554,7 +550,11 @@ export default function SettingsPage(): JSX.Element {
             ))}
           </Dropdown>
         </Field>
-        <Button appearance="subtle" icon={<ArrowResetRegular />} onClick={() => setConfirmReset(true)}>
+        <Button
+          appearance="subtle"
+          icon={<ArrowResetRegular />}
+          onClick={() => setConfirmReset(true)}
+        >
           Alle Einstellungen zurücksetzen
         </Button>
       </SectionCard>

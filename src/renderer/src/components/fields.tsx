@@ -20,20 +20,7 @@ export const germanCalendarStrings: CalendarStrings = {
     'November',
     'Dezember'
   ],
-  shortMonths: [
-    'Jan',
-    'Feb',
-    'Mär',
-    'Apr',
-    'Mai',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Okt',
-    'Nov',
-    'Dez'
-  ],
+  shortMonths: ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'],
   days: ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'],
   shortDays: ['S', 'M', 'D', 'M', 'D', 'F', 'S'],
   goToToday: 'Heute',

@@ -25,6 +25,7 @@ export function useReminders({ guidance, runningEntry, runningBreak }: Reminders
   const settings = useAppStore((state) => state.settings)
   const notify = useNotify()
   const lastBreakStatus = useRef<string>('idle')
+  const idleNotified = useRef(false)
 
   const ergonomicsActive =
     settings.ergonomicsEnabled &&
@@ -52,6 +53,35 @@ export function useReminders({ guidance, runningEntry, runningBreak }: Reminders
     }, 1000)
     return () => clearInterval(timer)
   }, [ergonomicsActive, settings, notify])
+
+  /* ---------------------------- Inaktivität ------------------------------ */
+  useEffect(() => {
+    const timeout = settings.idleTimeoutMinutes
+    if (!runningEntry || timeout <= 0) {
+      idleNotified.current = false
+      return undefined
+    }
+    const timer = setInterval(() => {
+      void window.zeitwerk.idleSeconds().then((seconds) => {
+        if (seconds >= timeout * 60) {
+          if (idleNotified.current) return
+          idleNotified.current = true
+          notify({
+            title: 'Seit einer Weile keine Eingabe',
+            body: `Die Erfassung läuft noch, seit ${Math.round(
+              seconds / 60
+            )} Minuten gab es aber keine Eingabe. Pause erfassen oder Erfassung beenden?`,
+            intent: 'warning',
+            timeout: 15000,
+            system: true
+          })
+        } else {
+          idleNotified.current = false
+        }
+      })
+    }, 30000)
+    return () => clearInterval(timer)
+  }, [runningEntry, settings.idleTimeoutMinutes, notify])
 
   /* --------------------------- Pausenhinweise ---------------------------- */
   useEffect(() => {

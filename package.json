@@ -20,7 +20,9 @@
     "dist": "npm run build && electron-builder",
     "dist:linux": "npm run build && electron-builder --linux",
     "dist:win": "npm run build && electron-builder --win",
-    "dist:mac": "npm run build && electron-builder --mac"
+    "dist:mac": "npm run build && electron-builder --mac",
+    "smoke": "electron-vite build && xvfb-run -a electron scripts/smoke.mjs",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "exceljs": "^4.4.0"

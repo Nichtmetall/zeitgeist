@@ -12,6 +12,8 @@ files:
   - '!{README.md,CHANGELOG.md,LICENSE}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
   - '!release/*'
+  - '!scripts/*'
+  - '!tests/*'
 asarUnpack:
   - resources/**
 win:

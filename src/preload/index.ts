@@ -1,11 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import type { ReportModel } from '../shared/report'
-import type {
-  AppData,
-  ExportResult,
-  ImportResult,
-  NotificationRequest
-} from '../shared/types'
+import type { AppData, ExportResult, ImportResult, NotificationRequest } from '../shared/types'
 
 /** Die einzige Brücke zwischen Renderer und Betriebssystem. */
 const api = {
@@ -37,8 +32,10 @@ const api = {
     ipcRenderer.invoke('shell:showItem', filePath),
   openPath: (filePath: string): Promise<string> => ipcRenderer.invoke('shell:openPath', filePath),
 
-  notify: (request: NotificationRequest): Promise<void> => ipcRenderer.invoke('app:notify', request),
+  notify: (request: NotificationRequest): Promise<void> =>
+    ipcRenderer.invoke('app:notify', request),
   flashFrame: (flash: boolean): Promise<void> => ipcRenderer.invoke('app:flashFrame', flash),
+  idleSeconds: (): Promise<number> => ipcRenderer.invoke('app:idleSeconds'),
 
   onNavigate: (handler: (page: string) => void): (() => void) => {
     const listener = (_event: Electron.IpcRendererEvent, page: string): void => handler(page)
