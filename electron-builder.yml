@@ -1,0 +1,36 @@
+appId: de.zeitwerk.app
+productName: Zeitwerk
+directories:
+  buildResources: build
+  output: release
+files:
+  - '!**/.vscode/*'
+  - '!src/*'
+  - '!electron.vite.config.{js,ts,mjs,cjs}'
+  - '!vitest.config.{js,ts,mjs,cjs}'
+  - '!{.eslintrc.cjs,.prettierrc,.prettierignore,.editorconfig}'
+  - '!{README.md,CHANGELOG.md,LICENSE}'
+  - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+  - '!release/*'
+asarUnpack:
+  - resources/**
+win:
+  target:
+    - nsis
+  artifactName: ${productName}-${version}-setup.${ext}
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  shortcutName: ${productName}
+mac:
+  category: public.app-category.productivity
+  target:
+    - dmg
+  artifactName: ${productName}-${version}-${arch}.${ext}
+linux:
+  target:
+    - AppImage
+    - deb
+  category: Office
+  maintainer: zeitwerk
+  artifactName: ${productName}-${version}-${arch}.${ext}
