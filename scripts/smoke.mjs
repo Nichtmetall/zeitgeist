@@ -234,6 +234,14 @@ async function run(window) {
 
   const ergonomics = await evaluate('document.body.innerText.includes("40-15-5")')
   check(ergonomics === true, 'Bewegungserinnerung ist sichtbar')
+  await wait(500)
+  const charts = await evaluate(`(() => ({
+    area: document.body.innerText.includes('Wochenverlauf'),
+    donut: document.body.innerText.includes('Anwesenheit'),
+    svgCount: document.querySelectorAll('svg').length
+  }))()`)
+  check(charts.area && charts.donut, 'Fluent-UI-Diagramme sind auf dem Dashboard sichtbar')
+  check(charts.svgCount >= 2, `${charts.svgCount} Diagramm-SVGs wurden gerendert`)
   await shoot('01-zeiterfassung')
 
   console.log('\nErfassung starten und stoppen')
@@ -308,6 +316,10 @@ async function run(window) {
     'document.body.innerText.includes("Zeitbuchung anlegen") && document.querySelectorAll(\'[role="dialog"]\').length > 0'
   )
   check(dialogOpen === true, 'Dialog für die neue Zeitbuchung geöffnet')
+  const bookingDialogWidth = await evaluate(
+    'Math.round(document.querySelector(\'[role="dialog"]\').getBoundingClientRect().width)'
+  )
+  check(bookingDialogWidth <= 520, `Zeitbuchungsdialog ist schlank (${bookingDialogWidth}px)`)
   await shoot('06-kalender-dialog')
 
   const prefilled = await evaluate(`(() => {
@@ -419,16 +431,25 @@ async function run(window) {
   console.log('\nEinstellungen')
   check(await clickByText('[role="tab"]', 'Einstellungen'), 'Seite "Einstellungen" geöffnet')
   await wait(900)
-  const settingsText = await evaluate('document.body.innerText')
-  for (const label of [
-    'Sollarbeitszeit',
-    'Arbeitszeitgesetz',
-    'Bewegung (40-15-5)',
-    'Kalender',
-    'Export',
-    'Darstellung'
+  const settingsTabs = await evaluate('document.querySelectorAll(\'main [role="tab"]\').length')
+  check(settingsTabs === 6, `Einstellungen sind in ${settingsTabs} Unterseiten gegliedert`)
+  check(
+    (await evaluate('document.body.innerText.includes("Sollarbeitszeit")')) === true,
+    'Unterseite "Arbeitszeit" ist geöffnet'
+  )
+  for (const [tab, content] of [
+    ['Arbeitszeitgesetz', 'Grenzwerte für Höchstarbeitszeit'],
+    ['Bewegung', 'Bewegung (40-15-5)'],
+    ['Kalender', 'Raster der Zeitauswahl'],
+    ['Export', 'CSV-Trennzeichen'],
+    ['Darstellung', 'Farbschema']
   ]) {
-    check(settingsText.includes(label), `Einstellungsbereich "${label}" vorhanden`)
+    check(await clickByText('main [role="tab"]', tab), `Unterseite "${tab}" geöffnet`)
+    await wait(200)
+    check(
+      (await evaluate(`document.body.innerText.includes(${JSON.stringify(content)})`)) === true,
+      `Unterseite "${tab}" zeigt die erwarteten Inhalte`
+    )
   }
   await shoot('11-einstellungen')
 
