@@ -11,7 +11,7 @@ const isDevelopment = !app.isPackaged
 // Electron's GPU compositor can leave an otherwise healthy renderer as a
 // uniformly dark window on some Linux graphics stacks after the first input.
 // Software rendering is more reliable for this primarily form-based desktop UI.
-if (process.platform === 'linux') {
+if (process.platform === 'linux' && !app.isReady()) {
   app.disableHardwareAcceleration()
 }
 
