@@ -8,6 +8,13 @@ import { flushPendingWrites, loadData } from './store'
 const currentDir = dirname(fileURLToPath(import.meta.url))
 const isDevelopment = !app.isPackaged
 
+// Electron's GPU compositor can leave an otherwise healthy renderer as a
+// uniformly dark window on some Linux graphics stacks after the first input.
+// Software rendering is more reliable for this primarily form-based desktop UI.
+if (process.platform === 'linux') {
+  app.disableHardwareAcceleration()
+}
+
 let mainWindow: BrowserWindow | null = null
 
 function createWindow(): void {

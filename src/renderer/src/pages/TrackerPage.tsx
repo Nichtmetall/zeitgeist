@@ -51,6 +51,7 @@ import {
   todayKey
 } from '@shared/time'
 import type { ErgonomicsPhase, WorkEntry, WorkKind } from '@shared/types'
+import DashboardCharts from '../components/DashboardCharts'
 import { ComplianceMessages, SectionCard, StatRow, StatTile } from '../components/ui'
 import { useNotify } from '../components/notifications'
 import { useNow } from '../hooks/useNow'
@@ -78,8 +79,8 @@ const useStyles = makeStyles({
   },
   clock: {
     fontVariantNumeric: 'tabular-nums',
-    fontSize: '56px',
-    lineHeight: '64px',
+    fontSize: tokens.fontSizeHero900,
+    lineHeight: tokens.lineHeightHero900,
     fontWeight: tokens.fontWeightSemibold
   },
   heroActions: {
@@ -342,6 +343,8 @@ export default function TrackerPage(): JSX.Element {
           />
         </div>
       </SectionCard>
+
+      <DashboardCharts days={week.days} />
 
       <SectionCard title="Hinweise nach Arbeitszeitgesetz" description={guidance.message}>
         <ComplianceMessages issues={issues} max={8} />

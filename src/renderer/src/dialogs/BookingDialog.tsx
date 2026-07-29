@@ -37,7 +37,10 @@ import { useNotify } from '../components/notifications'
 import { useAppStore } from '../state/store'
 
 const useStyles = makeStyles({
-  surface: { maxWidth: '620px' },
+  surface: {
+    width: 'min(520px, calc(100vw - 32px))',
+    maxWidth: '520px'
+  },
   column: {
     display: 'flex',
     flexDirection: 'column',
@@ -45,9 +48,12 @@ const useStyles = makeStyles({
   },
   grid: {
     display: 'grid',
-    gridTemplateColumns: '1fr 1fr 1fr 1fr',
+    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
     gap: tokens.spacingHorizontalM,
-    alignItems: 'end'
+    alignItems: 'end',
+    '@media (max-width: 560px)': {
+      gridTemplateColumns: '1fr'
+    }
   },
   swatch: {
     display: 'inline-block',
@@ -324,6 +330,7 @@ export default function BookingDialog({
               <Textarea
                 value={description}
                 resize="vertical"
+                rows={3}
                 placeholder="Was wurde in dieser Zeit bearbeitet?"
                 onChange={(_event, data) => setDescription(data.value)}
               />
